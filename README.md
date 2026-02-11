@@ -43,15 +43,15 @@ You will need a C compiler (such as `gcc`).
 ## 📝 Usage Example
 
 ```text
-db > insert 1 generic genericuser@email.com
-Executed.
+db > insert generic genericuser@email.com
+Insert Executed.
 
-db > insert 2 John Doe john_doe@email.com
-Executed.
+db > insert John Doe john_doe@email.com
+Insert Executed.
 
 db > select
 (1, generic, genericuser@email.com)
 (2, John Doe, john_doe@email.com)
-Executed.
+Select Executed.
 
 db > .exit
