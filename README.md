@@ -43,15 +43,18 @@ You will need a C compiler (such as `gcc`).
 ## 📝 Usage Example
 
 ```text
-db > insert generic genericuser@email.com
+db > insert firstuser user@mail.com
 Insert Executed.
 
-db > insert John Doe john_doe@email.com
+db > insert user2 seconduser@generic.web
 Insert Executed.
 
 db > select
-(1, generic, genericuser@email.com)
-(2, John Doe, john_doe@email.com)
+ID   | Username                        | Email
+--------------------------------------------------------------
+1    | firstuser                       | user@mail.com
+2    | user2                           | seconduser@generic.web
+--------------------------------------------------------------
 Select Executed.
 
 db > .exit
