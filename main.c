@@ -5,6 +5,7 @@
 
 #define COLUMN_USERNAME_SIZE 32
 #define COLUMN_EMAIL_SIZE 255
+
 typedef struct{
     char *buffer;
     size_t buffer_length;
@@ -55,7 +56,7 @@ void print_prompt() {
     printf("db > ");
 }
 
-void close_input_buffer(InputBuffer *input_buffer) {
+void free_input_buffer(InputBuffer *input_buffer) {
     free(input_buffer->buffer);
     free(input_buffer);
 }
@@ -63,7 +64,7 @@ void close_input_buffer(InputBuffer *input_buffer) {
 void read_input(InputBuffer *input_buffer) {
     ssize_t bytes_read = getline(&(input_buffer->buffer), &(input_buffer->buffer_length), stdin);
     if (bytes_read<0) {
-        printf("Reading error");
+        printf("Reading Error.");
         exit(EXIT_FAILURE);
     }
     if (input_buffer->buffer[bytes_read - 1] == '\n') {
@@ -74,16 +75,16 @@ void read_input(InputBuffer *input_buffer) {
 
 MetaCommandResult do_meta_command(InputBuffer *input_buffer) {
     if (strcmp(input_buffer->buffer, ".exit") == 0) {
-        close_input_buffer(input_buffer);
+        free_input_buffer(input_buffer);
         exit(EXIT_SUCCESS);
     }
 
     if (strcmp(input_buffer->buffer, ".help") == 0) {
         printf("\n------- Help Menu -------\n");
-        printf(".exit   : Exits the database\n");
-        printf(".help   : Prints the help menu\n");
-        printf("insert \"username\" \"email\" : Inserts a new user \n");
-        printf("select  : Prints database content\n");
+        printf(".exit   : Exits the database.\n");
+        printf(".help   : Prints the help menu.\n");
+        printf("insert \"username\" \"email\" : Inserts a new user.\n");
+        printf("select  : Prints database content.\n");
         printf("----------------------------\n\n");
         return META_COMMAND_SUCCESS;
     }
@@ -93,7 +94,8 @@ MetaCommandResult do_meta_command(InputBuffer *input_buffer) {
 PrepareResult prepare_statement(InputBuffer *input_buffer, Statement *statement) {
     if (strncmp(input_buffer->buffer,"insert", 6)==0) {
         statement->statement_type = STATEMENT_INSERT;
-        int argc = sscanf(input_buffer->buffer, "insert %s %s", statement->row_to_insert.username, statement->row_to_insert.email);
+        int argc =
+            sscanf(input_buffer->buffer, "insert %s %s", statement->row_to_insert.username, statement->row_to_insert.email);
         if (argc<2) {
             return PREPARE_SYNTAX_ERROR;
         }
@@ -106,13 +108,43 @@ PrepareResult prepare_statement(InputBuffer *input_buffer, Statement *statement)
     return PREPARE_UNRECOGNIZED_STATEMENT;
 }
 
+int global_rows_number;
+
+int find_rows_number(FILE *file){
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    long row_width = sizeof(User);
+    int num_rows = file_size / row_width;
+    return num_rows;
+}
+
 ExecuteResult execute_insert(Statement *statement){
-    printf("Insert executed\n");
+    FILE *file = fopen("file.db", "ab");
+    if (file==NULL){
+        return EXECUTE_ERROR;
+    }
+    statement->row_to_insert.id = global_rows_number + 1;
+    fwrite(&(statement->row_to_insert), sizeof(User), 1, file);
+    fclose(file);
+    global_rows_number ++;
     return EXECUTE_SUCCESS;
 }
 
 ExecuteResult execute_select(Statement *statement){
-    printf("Select executed\n");
+
+    FILE *file = fopen("file.db", "rb");
+    if (file==NULL){
+        return EXECUTE_ERROR;
+    }
+    User row;
+    printf("\n%-4s | %-31s | %s\n", "ID", "Username", "Email");
+    printf("--------------------------------------------------------------\n");
+    for (int i = 0; i < global_rows_number; i++) {
+        fread(&row, sizeof(User), 1, file);
+        printf("%-4d | %-31s | %s\n", row.id, row.username, row.email);
+    }
+    printf("--------------------------------------------------------------\n");
+    fclose(file);
     return EXECUTE_SUCCESS;
 }
 
@@ -127,9 +159,18 @@ ExecuteResult execute_statement(Statement *statement) {
     }
 }
 
+
+
 int main(int argc, char* argv[]) {
     InputBuffer *input_buffer = new_input_buffer();
-
+    FILE *f = fopen("file.db", "rb");
+    if (f == NULL) {
+        global_rows_number = 0;
+    } else {
+        global_rows_number = find_rows_number(f);
+        fclose(f);
+    }
+    fclose(f);
     while (true) {
         print_prompt();
         read_input(input_buffer);
@@ -156,7 +197,19 @@ int main(int argc, char* argv[]) {
                     continue;
                 }
             }
-            execute_statement(&input_statement);
+            switch (execute_statement(&input_statement)) {
+                case (EXECUTE_ERROR) : {
+                    printf("Command failed\n");
+                    break;
+                }
+                case(EXECUTE_SUCCESS) : {
+                    if (input_statement.statement_type==STATEMENT_INSERT)
+                        printf("Insert Executed.\n");
+                    if (input_statement.statement_type==STATEMENT_SELECT)
+                        printf("Select Executed.\n");
+                    break;
+                }
+            }
         }
     }
     return 0;
