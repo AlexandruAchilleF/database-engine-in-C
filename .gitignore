@@ -2,8 +2,4 @@ main
 .DS_Store
 .idea/
 *.o
-main
-main
-.DS_Store
-.idea/
-*.o
+
