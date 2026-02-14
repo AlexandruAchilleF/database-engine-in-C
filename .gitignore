@@ -7,3 +7,4 @@ main
 .DS_Store
 .idea/
 *.o
+*.db
