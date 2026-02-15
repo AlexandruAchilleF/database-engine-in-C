@@ -1,29 +1,29 @@
-# SimpleDB-C 🗄️
+# SimpleDB-C
 
-A simple, console-based (CLI) database engine written from scratch in pure C.
+A simple, console-based (CLI) database engine written from scratch in C.
 
-This project was created for educational purposes to understand the fundamental concepts behind Database Management Systems (DBMS): how data is stored on disk (in binary format), how to manage memory manually, and how to structure a C project.
+This project was created for educational purposes to understand how data is stored on disk (in binary format), how to manage memory manually, and how to structure a C project.
 
-## 🚀 Features
+## Features
 
-* **CLI Interface:** An interactive loop that accepts commands, similar to a standard SQL shell.
+* **CLI Interface:** An interactive loop that accepts commands similar to a standard SQL shell.
 * **SQL-like Commands:** Supports operations such as `insert`, `select`, `update`, and `delete`.
 * **Meta-commands:** Supports system commands like `.exit` and `.help`.
 * **Persistence:** Data is preserved after the program closes; it is saved to a local binary file (`file.db`).
 * **Binary Format:** Uses C structure serialization to efficiently write data to disk.
 * **No Dependencies:** Built using only standard C libraries.
 
-## 🛠️ Technical Concepts Explored
+## Technical Concepts Explored
 
-This project explores the following C programming concepts:
+This project explores the following concepts:
 * **Pointers & Dynamic Allocation:** Manual memory management using `malloc` and `free`.
 * **File I/O:** Reading and writing data structures directly to binary files (using `fwrite`, `fread`, `fseek`).
-* **Multi-file Compilation:** Linking multiple source files (`main.c`, `functions.c`) and header files.
+* **Multi-file Compilation:** Linking multiple source files (`main.c`, `core_engine.c`) and header files.
 * **Parsing:** Tokenizing user input to interpret commands using `sscanf`.
 
-## 💻 How to Build and Run
+## How to Build and Run
 
-You will need a C compiler (such as `gcc` or `clang`).
+You will need a C compiler such as `gcc`.
 
 1.  **Clone the repository:**
     ```bash
@@ -42,7 +42,7 @@ You will need a C compiler (such as `gcc` or `clang`).
     ./db
     ```
 
-## 📝 Usage Example
+## Usage Example
 
 ```text
 db > .help
