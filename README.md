@@ -23,24 +23,25 @@ This project explores the following concepts:
 
 ## How to Build and Run
 
-You will need a C compiler such as `gcc`.
+You will need a C compiler (such as `gcc` or `clang`).
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/AlexandruAchilleF/database-engine-in-C.git
+    git clone [https://github.com/AlexandruAchilleF/database-engine-in-C.git](https://github.com/AlexandruAchilleF/database-engine-in-C.git)
     cd database-engine-in-C
     ```
 
 2.  **Compile:**
-    *Note: You must compile both source files together.*
+    *Note: You must compile the main file and the core engine file together.*
     ```bash
-    gcc main.c functions.c -o db
+    gcc main.c engine_core.c -o db
     ```
 
 3.  **Run:**
     ```bash
     ./db
     ```
+    *Note: Upon running and inserting data, a `file.db` binary file will be automatically generated in the same directory to persistently store your database records.*
 
 ## Usage Example
 
