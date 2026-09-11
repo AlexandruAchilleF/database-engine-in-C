@@ -18,7 +18,7 @@ This project was created for educational purposes to understand how data is stor
 This project explores the following concepts:
 * **Pointers & Dynamic Allocation:** Manual memory management using `malloc` and `free`.
 * **File I/O:** Reading and writing data structures directly to binary files (using `fwrite`, `fread`, `fseek`).
-* **Multi-file Compilation:** Linking multiple source files (`main.c`, `core_engine.c`) and header files.
+* **Multi-file Compilation:** Linking multiple source files (`src/main.c`, `src/core_engine.c`) and header files.
 * **Parsing:** Tokenizing user input to interpret commands using `sscanf`.
 
 ## How to Build and Run
@@ -34,7 +34,7 @@ You will need a C compiler (such as `gcc` or `clang`).
 2.  **Compile:**
     *Note: You must compile the main file and the core engine file together.*
     ```bash
-    gcc main.c engine_core.c -o db
+    gcc src/main.c src/engine_core.c -o db
     ```
 
 3.  **Run:**
