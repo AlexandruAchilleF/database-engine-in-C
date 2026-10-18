@@ -1,3 +1,24 @@
+# Compiled binaries and object files
+db
 main
+*.o
+*.out
+
+# Debug artifacts
+*.dSYM/
+
+# Database files
 *.db
+*.db-wal
+*.db-shm
+
+# IDE and Editor configurations
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Operating System files
 .DS_Store
+Thumbs.db
