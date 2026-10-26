@@ -1,49 +1,48 @@
 # SimpleDB-C
 
-A simple, console-based (CLI) database engine written from scratch in C.
+![C](https://img.shields.io/badge/language-C-A8B9CC?logo=c&logoColor=white)
+![Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)
 
-This project was created for educational purposes to understand how data is stored on disk (in binary format), how to manage memory manually, and how to structure a C project.
+A small single-table storage engine written from scratch in C, with an interactive SQL-like shell and binary on-disk persistence.
+
+I built it to understand what a database actually does underneath: how records are laid out on disk, how they are read back, updated and deleted in place, and how to manage memory by hand without leaks.
 
 ## Features
 
-* **CLI Interface:** An interactive loop that accepts commands similar to a standard SQL shell.
-* **SQL-like Commands:** Supports operations such as `insert`, `select`, `update`, and `delete`.
-* **Meta-commands:** Supports system commands like `.exit` and `.help`.
-* **Persistence:** Data is preserved after the program closes; it is saved to a local binary file (`file.db`).
-* **Binary Format:** Uses C structure serialization to efficiently write data to disk.
-* **No Dependencies:** Built using only standard C libraries.
+- **Interactive REPL** — a shell that accepts `insert`, `select`, `update` and `delete`, plus the meta-commands `.help` and `.exit`.
+- **Binary persistence** — records are written to `file.db` as fixed-size binary rows and survive restarts.
+- **In-place updates and soft deletes** — `update` and `delete` seek directly to a row's offset in the file; deleted rows are flagged rather than physically removed.
+- **No dependencies** — only the C standard library and POSIX.
 
-## Technical Concepts Explored
+## How data is stored
 
-This project explores the following concepts:
-* **Pointers & Dynamic Allocation:** Manual memory management using `malloc` and `free`.
-* **File I/O:** Reading and writing data structures directly to binary files (using `fwrite`, `fread`, `fseek`).
-* **Multi-file Compilation:** Linking multiple source files (`src/main.c`, `src/core_engine.c`) and header files.
-* **Parsing:** Tokenizing user input to interpret commands using `sscanf`.
+Every record is a fixed-size `User` row, so row *n* always starts at byte `n × sizeof(User)`. That is what makes direct `fseek` access possible.
 
-## How to Build and Run
+```mermaid
+flowchart LR
+    subgraph file.db
+        R1["Row 0<br/>id · username[32] · email[255] · is_deleted"]
+        R2["Row 1"]
+        R3["Row 2"]
+        R4["…"]
+    end
+    R1 --- R2 --- R3 --- R4
+```
 
-You will need a C compiler (such as `gcc` or `clang`).
+## Build and run
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/AlexandruAchilleF/database-engine-in-C.git](https://github.com/AlexandruAchilleF/database-engine-in-C.git)
-    cd database-engine-in-C
-    ```
+You need `gcc` or `clang`.
 
-2.  **Compile:**
-    *Note: You must compile the main file and the core engine file together.*
-    ```bash
-    gcc src/main.c src/engine_core.c -o db
-    ```
+```bash
+git clone https://github.com/AlexandruAchilleF/database-engine-in-C.git
+cd database-engine-in-C
+gcc src/main.c src/engine_core.c -o db
+./db
+```
 
-3.  **Run:**
-    ```bash
-    ./db
-    ```
-    *Note: Upon running and inserting data, a `file.db` binary file will be automatically generated in the same directory to persistently store your database records.*
+The first `insert` creates `file.db` in the current directory.
 
-## Usage Example
+## Usage
 
 ```text
 db > .help
@@ -76,11 +75,32 @@ Executed.
 db > delete 2
 Executed.
 
-db > select
-ID   | Username                        | Email
---------------------------------------------------------------
-1    | newname                         | new@mail.com
---------------------------------------------------------------
-Executed.
-
 db > .exit
+```
+
+## Project structure
+
+| File | Role |
+| --- | --- |
+| `src/main.c` | REPL loop and startup (loads row count and max id from disk) |
+| `src/engine_core.c` | Command parsing, statement execution, file I/O |
+| `src/engine_core.h` | Engine function declarations |
+| `src/common.h` | Shared types: `User` row, statements, result codes |
+
+## Concepts explored
+
+- Manual memory management with `malloc` / `free`
+- Binary file I/O with `fwrite`, `fread` and `fseek`
+- Parsing user input with `sscanf`
+- Splitting a C program into modules with headers
+
+## Limitations and roadmap
+
+The schema is currently fixed to one table (`id`, `username`, `email`) and every operation does a linear scan. The next milestones are:
+
+1. Fix known correctness issues (zeroing rows before writing them, rejecting updates on deleted rows, EOF handling in the REPL).
+2. Add a `Makefile`, automated tests and CI with sanitizers.
+3. Replace the flat file with a pager and a B+ tree index.
+4. Support `WHERE` clauses and `CREATE TABLE`.
+
+The full plan is in [`roadmap.md`](roadmap.md) (in Romanian).
